@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 20px;
+        }
+        table{
+            width: 100%;
+            border-collapse: collapse;
+            padding: 10px;
+        }
+        th{
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+        button{
+            margin-top:20px ;
+            padding: 10px;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }   
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Medical Bill Generator</h2> 
+    <label>Patient Name: <input type="text" id="patientName"></label>
+    <label>Age: <input type="number" id="patientAge"></label>
+    <label >Date: <input type="date" id="billDate"></label>
+    <label >Time: <input type="time" id="timeNow"></label>
+    <h3>Medical Items</h3>
+    <table id="billItems">
+        <thead>
+            <tr>
+                <th>ItemName</th>
+                <th>Quantity</th>
+                <th>Price Per Unit</th>
+                <th>Total</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="billBody">
+            <!-- Items i will add dynamically here -->
+        </tbody>
+    </table>
+    <button class="no-print" onclick="addItem()">Add Item</button>
+   
+    <h3>Total Bill: <span id="totalBill" style="text-align:right;">0</span></h3>
+    <button onclick="printBill()" class="no-print">printBill</button>
+   
+    <script>
+        let totalAmount=0
+        function addItem(){
+            let tableBody=document.getElementById('billBody')
+            let  row=tableBody.insertRow()
+            let itemName=row.insertCell(0)
+            let quantity=row.insertCell(1)
+            let priceperUnit=row.insertCell(2)
+            let total=row.insertCell(3)
+            let action=row.insertCell(4)
+            itemName.innerHTML=`<input type="text" placeholder="Enter the item" style="width:100px; margin-top:5px; border:1px solid black;
+            padding:10px;">`
+            quantity.innerHTML=`<input type="number" value="1" min="1" oninput="updateTotal(this)">`
+            priceperUnit.innerHTML=`<input type="number" value="0" min="0" oninput="updateTotal(this)">`
+            total.innerHTML=`0`;
+            action.innerHTML=`<button class="no-print" onclick="removeItem(this)">Remove</button>`
+        }
+        function updateTotal(element){
+            let row=element.parentElement.parentElement
+            let qty=row.cells[1].children[0].value;
+            // console.log(qty)
+            let price=row.cells[2].children[0].value;
+            let total=qty*price;
+            row.cells[3].innerText=`${total}`
+            // console.log(total)
+            calaculateTotal()
+        }
+        function calaculateTotal(){
+            let table=document.getElementById('billBody')
+            let total=0
+            for (let i = 0; i < table.rows.length; i++) {
+                let row = table.rows[i];
+                let itemTotal = row.cells[3].innerText.replace("$", "") || 0;
+                total += parseFloat(itemTotal);
+            }
+            // console.log(total)
+            total=total+total*(18/100)
+            document.getElementById('totalBill').innerText=total.toFixed(2)
+        }
+        function removeItem(button){
+            let row=button.parentElement.parentElement;
+            row.remove()
+            calaculateTotal()
+        }
+        function printBill(){
+            window.print()
+        }
+    </script>
+</body>
+</html>
